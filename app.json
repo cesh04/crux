@@ -1,0 +1,49 @@
+{
+  "expo": {
+    "name": "crux",
+    "slug": "crux",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/images/icon.png",
+    "scheme": "crux",
+    "userInterfaceStyle": "automatic",
+    "newArchEnabled": true,
+    "splash":
+        {
+          "image": "./assets/images/icon.png",
+          "resizeMode": "contain",
+          "backgroundColor": "#0B090D"
+        },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier" : "com.neal.crux"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/images/icon.png",
+        "backgroundColor": "#ffffff"
+      },
+      "edgeToEdgeEnabled": true,
+      "softwareKeyboardLayoutMode": "pan",
+      "package": "com.neal.crux"
+    },
+    "web": {
+      "bundler": "metro",
+      "output": "static",
+      "favicon": "./assets/images/favicon.png"
+    },
+    "plugins": [
+      "expo-router",
+      "expo-font"
+    ],
+    "experiments": {
+      "typedRoutes": true
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "fc37d06f-eca9-4b39-b8b6-ad04a5ace3bc"
+      }
+    }
+  }
+}
