@@ -15,7 +15,7 @@ import {
   serverTimestamp,
   writeBatch,
 } from 'firebase/firestore';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   ActivityIndicator,
   Alert,
@@ -136,9 +136,9 @@ const HomePage = () => {
       cleanJsonString = jsonMatch[0];
       cleanJsonString = cleanJsonString.replace(/\\'/g, "'");
 
-      console.log('--- GEMINI RAW (CLEANED) RESPONSE ---');
-      console.log(cleanJsonString);
-      console.log('------------------------------------');
+      // console.log('--- GEMINI RAW (CLEANED) RESPONSE ---');
+      // console.log(cleanJsonString);
+      // console.log('------------------------------------');
 
       const aiData = JSON.parse(cleanJsonString);
 

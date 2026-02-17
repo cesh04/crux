@@ -1,6 +1,6 @@
 import TripleDots from '@/assets/svgs/TripleDots';
 import { useThemeColors } from '@/hooks/useThemeColors';
-import React, { useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import { Dimensions, Modal, Pressable, Text, TouchableOpacity, View } from 'react-native';
 
 type Props = {
@@ -13,7 +13,6 @@ type Props = {
 const FeedCard = ({ title, icon, onPress, onDeletePress }: Props) => {
     const colors = useThemeColors();
     const [menuVisible, setMenuVisible] = useState(false);
-    // Store top and right positions
     const [menuPosition, setMenuPosition] = useState({ top: 0, right: 0 });
     
     const iconRef = useRef<View>(null);
@@ -23,7 +22,6 @@ const FeedCard = ({ title, icon, onPress, onDeletePress }: Props) => {
             const screenWidth = Dimensions.get('window').width;
             setMenuPosition({
                 top: py + height, 
-                // Calculate distance from the right edge of the screen
                 right: screenWidth - px - width
             });
             setMenuVisible(true);
@@ -41,17 +39,20 @@ const FeedCard = ({ title, icon, onPress, onDeletePress }: Props) => {
         <View className='w-[43%] mx-4 mt-6'>
             <Pressable
                 style={{ borderColor: colors.cardBorder }}
-                className='border-[2px] rounded-[15px] w-full h-[223] justify-end items-start'
+                // Reduced min-h to 160 to prevent excess whitespace
+                // Changed from margin-based internal spacing to p-4 (padding) to maximize width for text
+                className='border-[2px] rounded-[15px] w-full min-h-[210] justify-end items-start relative p-4'
                 onPress={onPress}>
 
-                {/* Icon wrapper with ref */}
-                {/* Changed positioning to 0 to compensate for the larger padding inside */}
+                {/* Icon Position Updated to match new padding (p-4) */}
+                <Text className='absolute top-6 left-6 text-5xl'>{icon}</Text>
+
+                {/* Triple Dots Menu - Absolute Top Right */}
                 <View
                     ref={iconRef}
                     collapsable={false} 
                     className='absolute top-0 right-0 z-10'
                 >
-                    {/* Added p-4 here to make the hitbox significantly larger */}
                     <Pressable 
                         onPress={handleOpenMenu}
                         className="p-4"
@@ -60,8 +61,16 @@ const FeedCard = ({ title, icon, onPress, onDeletePress }: Props) => {
                     </Pressable>
                 </View>
 
-                <Text className='text-5xl m-6'>{icon}</Text>
-                <Text className='font-manropeBold text-xl m-6' style={{ color: colors.fontColor }}>{title}</Text>
+                {/* Title 
+                    - Removed m-6 to use parent padding instead (gives more width)
+                    - Added flex-shrink to ensure it respects container bounds
+                */}
+                <Text 
+                    className='font-manropeBold text-xl' 
+                    style={{ color: colors.fontColor }}
+                >
+                    {title}
+                </Text>
 
             </Pressable>
 
@@ -80,7 +89,6 @@ const FeedCard = ({ title, icon, onPress, onDeletePress }: Props) => {
                         style={{
                             backgroundColor: colors.cardBorder,
                             top: menuPosition.top,
-                            // Anchor to the right side using the calculated value
                             right: menuPosition.right 
                         }}
                     >

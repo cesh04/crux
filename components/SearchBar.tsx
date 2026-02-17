@@ -1,7 +1,6 @@
 import SearchIcon from '@/assets/svgs/SearchIcon';
 import { useThemeColors } from '@/hooks/useThemeColors';
-import React from 'react';
-import { StyleProp, TextInput, View, ViewStyle } from 'react-native';
+import { Pressable, StyleProp, Text, TextInput, View, ViewStyle } from 'react-native';
 
 interface SearchBarProps {
   value: string;
@@ -39,6 +38,22 @@ const SearchBar = ({
         placeholderTextColor={colors.fontColor} // Use the dimmer color for placeholder
         returnKeyType="search"
       />
+
+      {/* Button shows up only when user types something */}
+      {value.length > 0 && (
+        <Pressable
+          onPress={onSubmit}
+          className="rounded-full px-4 py-1.5 ml-2"
+          style={{ backgroundColor: colors.y }}
+        >
+          <Text 
+            className="font-manropeBold text-sm"
+            style={{ color: colors.scrollingFont }}
+          >
+            Go!
+          </Text>
+        </Pressable>
+      )}
     </View>
   );
 };

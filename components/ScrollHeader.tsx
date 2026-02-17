@@ -2,7 +2,6 @@
 import { useThemeColors } from "@/hooks/useThemeColors";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
-import React from "react";
 import { Platform, Text, TouchableOpacity, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -28,7 +27,7 @@ export default function ScrollHeader({ title }: Props) {
       </TouchableOpacity>
 
       <Text
-        className="text-[28px] font-semibold flex-1 text-center font-manropeBold"
+        className="text-[22px] font-semibold flex-1 text-center font-manropeBold"
         style={{ color: colors.scrollingFont }}
         numberOfLines={1}
       >

@@ -3,21 +3,43 @@ import Settings from '@/assets/svgs/Settings';
 import { useThemeColors } from "@/hooks/useThemeColors";
 import { useRouter } from 'expo-router';
 import { signOut } from 'firebase/auth';
-import React from 'react';
-// Import TouchableOpacity from 'react-native'
-import { Alert, Modal, Pressable, Text, TouchableOpacity, View } from 'react-native';
-// We no longer need this import:
-// import { TouchableOpacity } from 'react-native-gesture-handler'; 
+import { useEffect, useRef } from 'react';
+import { Alert, Animated, Dimensions, Easing, Modal, Pressable, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { auth } from '../firebaseConfig'; // Make sure this path is correct
+import { auth } from '../firebaseConfig';
 
 interface HomeBurgerProps {
   isVisible: boolean;
   onClose: () => void;
 }
 
+const { width: SCREEN_WIDTH } = Dimensions.get('window');
+
 const HomeBurger = ({ isVisible, onClose }: HomeBurgerProps) => {
   const router = useRouter();
+  const slideAnim = useRef(new Animated.Value(0)).current;
+
+  // Animate slide when modal becomes visible
+  useEffect(() => {
+    if (isVisible) {
+      slideAnim.setValue(0);
+      Animated.timing(slideAnim, {
+        toValue: 1,
+        duration: 300, // Smooth 300ms animation
+        easing: Easing.out(Easing.cubic), // Decelerate smoothly
+        useNativeDriver: true,
+      }).start();
+    }
+  }, [isVisible]);
+
+  const closeMenu = () => {
+    Animated.timing(slideAnim, {
+      toValue: 0,
+      duration: 250, // Slightly faster exit
+      easing: Easing.in(Easing.cubic), // Accelerate out
+      useNativeDriver: true,
+    }).start(() => onClose());
+  };
 
   const proceedToLogout = async () => {
     try {
@@ -28,93 +50,117 @@ const HomeBurger = ({ isVisible, onClose }: HomeBurgerProps) => {
   };
 
   const handleLogout = () => {
-    onClose();
-    Alert.alert(
-      'Sign Out?',
-      'Are you sure? Your data is saved and will be here when you log back in.',
-      [
-        {
-          text: 'Cancel',
-          style: 'cancel',
-        },
-        {
-          text: 'Sign Out',
-          style: 'destructive',
-          onPress: proceedToLogout,
-        },
-      ]
-    );
+    closeMenu();
+    // Add small delay to let animation start smoothly before Alert
+    setTimeout(() => {
+      Alert.alert(
+        'Sign Out?',
+        'Are you sure? Your data is saved and will be here when you log back in.',
+        [
+          {
+            text: 'Cancel',
+            style: 'cancel',
+          },
+          {
+            text: 'Sign Out',
+            style: 'destructive',
+            onPress: proceedToLogout,
+          },
+        ]
+      );
+    }, 100);
   };
 
   const goToSettings = () => {
-    onClose();
-    // Make sure this settings page exists: /app/(app)/settings.tsx
+    closeMenu();
     router.push('/(app)/settingsPage');
   };
 
   const colors = useThemeColors();
 
+  const drawerTranslateX = slideAnim.interpolate({
+    inputRange: [0, 1],
+    outputRange: [-SCREEN_WIDTH, 0],
+  });
+
   return (
     <Modal
       transparent={true}
       visible={isVisible}
-      animationType="fade"
-      onRequestClose={onClose}
+      animationType="none" // Disable default animation
+      onRequestClose={closeMenu} // Handle hardware back button
     >
-      <Pressable onPress={onClose} className="flex-1 bg-black/50">
-        <Pressable
-          className={`
-            absolute top-0 left-0 h-full w-3/4 max-w-xs
-            shadow-lg
-          `}
-          // Use inline style for dynamic background color from hook
-          style={{ backgroundColor: colors.cardBorder }}
+      <View style={{ flex: 1 }}>
+        {/* Backdrop - Fades in/out */}
+        <Animated.View 
+            style={{ 
+                ...StyleSheet.absoluteFillObject, 
+                opacity: slideAnim,
+                backgroundColor: 'rgba(0,0,0,0.5)' 
+            }}
         >
-          <SafeAreaView className="flex-1">
-            <View className="px-5 py-6">
-              <Text 
-                className="text-3xl font-bold"
-                style={{ color: colors.fontColor }}
-              >
-                Menu
-              </Text>
-            </View>
+            <Pressable onPress={closeMenu} style={{ flex: 1 }} />
+        </Animated.View>
 
-            <View 
-              className="border-b mx-5" 
-              style={{ borderColor: colors.fieldBorder }} 
-            />
-
-            <View className="mt-4">
-              <TouchableOpacity
-                onPress={goToSettings}
-                className="flex-row items-center px-5 py-4"
-              >
-                <Settings color={colors.fontColor} /> 
+        {/* Drawer - Slides in/out */}
+        <Animated.View 
+            style={{ 
+                position: 'absolute', top: 0, bottom: 0, left: 0,
+                width: '75%', maxWidth: 320, // Matches w-3/4 max-w-xs
+                transform: [{ translateX: drawerTranslateX }],
+                backgroundColor: colors.backColor,
+                shadowColor: "#000", 
+                shadowOffset: {width: 0, height: 2}, 
+                shadowOpacity: 0.25, 
+                shadowRadius: 3.84, 
+                elevation: 5
+            }}
+        >
+            <SafeAreaView style={{ flex: 1 }}>
+              <View className="px-5 py-6">
                 <Text 
-                  className="text-lg ml-4"
+                  className="text-3xl font-bold"
                   style={{ color: colors.fontColor }}
                 >
-                  Settings
+                  Menu
                 </Text>
-              </TouchableOpacity>
+              </View>
 
-              <TouchableOpacity
-                onPress={handleLogout}
-                className="flex-row items-center px-5 py-4"
-              >
-                <LogOut color={colors.fontColor} />
-                <Text 
-                  className="text-lg ml-4"
-                  style={{ color: colors.fontColor }}
+              <View 
+                className="border-b mx-5" 
+                style={{ borderColor: colors.fieldBorder }} 
+              />
+
+              <View className="mt-4">
+                <TouchableOpacity
+                  onPress={goToSettings}
+                  className="flex-row items-center px-5 py-4"
                 >
-                  Sign out
-                </Text>
-              </TouchableOpacity>
-            </View>
-          </SafeAreaView>
-        </Pressable>
-      </Pressable>
+                  <Settings color={colors.fontColor} /> 
+                  <Text 
+                    className="text-lg ml-4"
+                    style={{ color: colors.fontColor }}
+                  >
+                    Settings
+                  </Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  onPress={handleLogout}
+                  className="flex-row items-center px-5 py-4"
+                >
+                  <LogOut color={colors.fontColor} />
+                  <Text 
+                    className="text-lg ml-4"
+                    style={{ color: colors.fontColor }}
+                  >
+                    Sign out
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            </SafeAreaView>
+        </Animated.View>
+      </View>
     </Modal>
   );
 };

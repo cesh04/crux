@@ -1,12 +1,10 @@
-import { useThemeColors } from '@/hooks/useThemeColors'
-import React from 'react'
-import { Pressable, View } from 'react-native'; // 1. Import Pressable
-import { SafeAreaView } from 'react-native-safe-area-context'
-import Hamburger from '../assets/svgs/Hamburger'
-import Logo from '../assets/svgs/Logo'
-import Gradient from './Gradient'
+import { useThemeColors } from '@/hooks/useThemeColors';
+import { Pressable, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import Hamburger from '../assets/svgs/Hamburger';
+import Logo from '../assets/svgs/Logo';
+import Gradient from './Gradient';
 
-// 2. Add type definition for the props
 interface HeaderProps {
   onMenuPress: () => void;
 }
@@ -19,8 +17,12 @@ const Header = ({ onMenuPress }: HeaderProps) => {
         edges={["top", "left", "right"]} 
         className="flex-row items-end justify-between bg-transparent w-full">
         
-        {/* 3. Wrap the Hamburger icon in a Pressable and add onPress */}
-        <Pressable onPress={onMenuPress} className='my-[12]'>
+        {/* Added hitSlop to significantly increase touch area */}
+        <Pressable 
+          onPress={onMenuPress} 
+          className='my-[12]'
+          hitSlop={{ top: 20, bottom: 20, left: 20, right: 20 }}
+        >
           <Hamburger color={colors.logo}/>
         </Pressable>
 
@@ -32,4 +34,4 @@ const Header = ({ onMenuPress }: HeaderProps) => {
   )
 }
 
-export default Header
+export default Header;
